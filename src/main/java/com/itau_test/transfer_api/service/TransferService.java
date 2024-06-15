@@ -1,5 +1,6 @@
 package com.itau_test.transfer_api.service;
 
+import com.itau_test.transfer_api.DTO.TransferRequestDTO;
 import lombok.extern.log4j.Log4j2;
 import org.json.JSONObject;
 import org.springframework.http.HttpMethod;
@@ -15,17 +16,17 @@ public class TransferService {
 	RequestService requestService;
 
 
-	public boolean create(UUID uuidTransfer, JSONObject transferDataObject) {
+	public boolean create(TransferRequestDTO transferDataObject) {
 
 		boolean result = false;
 
-		log.info("m=create; stage=init; transactionUUID= {}; transferJson= {}", uuidTransfer, transferDataObject);
+		log.info("m=create; stage=init; transactionUUID= {}; transferJson= {}", transferDataObject.getTransferId(), transferDataObject);
 
-		boolean receivingClientExists = clientExists(transferDataObject.getString("receiveClientId"));
+		boolean receivingClientExists = clientExists(transferDataObject.getReceivingClientId());
 
 		if (receivingClientExists) {
 			// bate na api de contgs
-			String sendingClientAccount = getAccountData(transferDataObject.getString("receiveClientAccount"));
+			String sendingClientAccount = getAccountData(transferDataObject.getSendingAccount());
 
 			boolean madeTheTransfer = makeTheTransfer(new JSONObject(sendingClientAccount), transferDataObject);
 
@@ -35,13 +36,12 @@ public class TransferService {
 			}
 		}
 
-		log.info("m=create; stage=finish; transactionUUID= {}; transferJson= {} , result={}", uuidTransfer, transferDataObject, result);
+		log.info("m=create; stage=finish; transactionUUID= {}; transferJson= {} , result={}", transferDataObject.getTransferId(), transferDataObject, result);
 		return result;
 	}
 
 
-	boolean makeTheTransfer(JSONObject accountData, JSONObject transferData) {
-
+	private boolean makeTheTransfer(JSONObject accountData, TransferRequestDTO transferData) {
 
 		if (accountData.getBoolean("ativo") && hasLimitEnough(accountData, transferData) && hasMoneyEnough(accountData, transferData)) {
 			// faz a transferencia
@@ -53,16 +53,16 @@ public class TransferService {
 	}
 
 
-	boolean hasLimitEnough(JSONObject accountData, JSONObject transferData) {
-		return accountData.getDouble("limiteDiario") < transferData.getDouble("amount");
+	private boolean hasLimitEnough(JSONObject accountData, TransferRequestDTO transferData) {
+		return accountData.getDouble("limiteDiario") < transferData.getAmount();
 	}
 
-	boolean hasMoneyEnough(JSONObject accountData, JSONObject transferData) {
-		return accountData.getDouble("saldo") < transferData.getDouble("amount");
+	private boolean hasMoneyEnough(JSONObject accountData, TransferRequestDTO transferData) {
+		return accountData.getDouble("saldo") < transferData.getAmount();
 	}
 
 
-	boolean clientExists(String clientId) {
+	private boolean clientExists(String clientId) {
 		// buscar o cliente e verifica se ele existe
 		ResponseEntity<?> stringResponseEntity = requestService.makeRequestWithoutBody("localhost:8080/clientes/" + clientId, HttpMethod.GET, String.class);
 		// todo - trocar isso aqui para o DTO
@@ -70,13 +70,13 @@ public class TransferService {
 		return stringResponseEntity.getStatusCode().value() == 200;
 	}
 
-	String getAccountData(String accountId) {
+	private String getAccountData(String accountId) {
 		// buscar a conta do client que esta fazendo a transferencia
 		return (String) requestService.makeRequestWithoutBody("localhost:8080/contas/" + accountId, HttpMethod.GET, String.class).getBody();
 		// todo - trocar isso aqui para o dto
 	}
 
-	String makeNotification() {
+	private String makeNotification() {
 		// faz a notificacao
 		return (String) requestService.makeRequestWithoutBody("localhost:8080/notificacoes/", HttpMethod.POST, String.class).getBody();
 		// todo - trocar isso aqui para o dto
