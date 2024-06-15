@@ -1,6 +1,7 @@
 package com.itau_test.transfer_api.service;
 
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -8,19 +9,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Log4j2
 public class RequestService {
 
-    RestTemplate restTemplate;
+	RestTemplate restTemplate;
 
-    ResponseEntity<String> makeRequestWithoutBody(String url, HttpMethod httpMethod) {
+	ResponseEntity<?> makeRequestWithoutBody(String url, HttpMethod httpMethod, Class classReturn) {
+		return makeRequestWithBody(url, httpMethod, classReturn, null);
+	}
 
-        HttpEntity<String> request = new HttpEntity<>(null);
-        return restTemplate.exchange(url, httpMethod, request, String.class);
-    }
+	ResponseEntity<?> makeRequestWithBody(String url, HttpMethod httpMethod, Class classReturn, Object body) {
 
-    ResponseEntity<String> makeRequestWithBody(String url, HttpMethod httpMethod, Object body) {
+		ResponseEntity exchange = null;
+		log.info("m=makeRequestWithBody; stage=init; transactionUUID= {}; Object= {}", "", "");
 
-        HttpEntity<Object> request = new HttpEntity<>(body);
-        return restTemplate.exchange(url, httpMethod, request, String.class);
-    }
+		try {
+			HttpEntity<?> request = new HttpEntity<>(body);
+			exchange = restTemplate.exchange(url, httpMethod, request, classReturn);
+		} catch (Exception ex) {
+
+		}
+		log.info("m=makeRequestWithBody; stage=finished; transactionUUID= {}; Object= {}", "", "");
+		return exchange;
+	}
 }

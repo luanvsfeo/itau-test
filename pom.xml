@@ -8,10 +8,10 @@
 		<version>3.3.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.itau-test</groupId>
-	<artifactId>transfer-api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>transfer-api</name>
+	<groupId>com.itau_test</groupId>
+	<artifactId>transfer_api</artifactId>
+	<version>1.0.0</version>
+	<name>transfer_api</name>
 	<description>API TRANSFER ITAU</description>
 	<properties>
 		<java.version>17</java.version>
