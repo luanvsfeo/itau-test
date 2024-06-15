@@ -15,6 +15,9 @@ public class TransferService {
 
 	RequestService requestService;
 
+	public TransferService(RequestService requestService) {
+		this.requestService = requestService;
+	}
 
 	public boolean create(TransferRequestDTO transferDataObject) {
 
@@ -45,6 +48,8 @@ public class TransferService {
 
 		if (accountData.getBoolean("ativo") && hasLimitEnough(accountData, transferData) && hasMoneyEnough(accountData, transferData)) {
 			// faz a transferencia
+			// colocar a chamada para atualizar o saldo de ambas as contas
+			// criar um banco de dados ?
 			return true;
 		} else {
 			// nao faz a transferencia
