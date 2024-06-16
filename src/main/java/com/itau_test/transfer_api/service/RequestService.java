@@ -11,25 +11,28 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @Log4j2
 public class RequestService {
-
 	RestTemplate restTemplate;
 
-	ResponseEntity<?> makeRequestWithoutBody(String url, HttpMethod httpMethod, Class classReturn) {
+	public RequestService(RestTemplate restTemplate) {
+		this.restTemplate = restTemplate;
+	}
+
+	public ResponseEntity<?> makeRequestWithoutBody(String url, HttpMethod httpMethod, Class classReturn) {
 		return makeRequestWithBody(url, httpMethod, classReturn, null);
 	}
 
-	ResponseEntity<?> makeRequestWithBody(String url, HttpMethod httpMethod, Class classReturn, Object body) {
+	public ResponseEntity<?> makeRequestWithBody(String url, HttpMethod httpMethod, Class classReturn, Object body) {
 
-		ResponseEntity exchange = null;
-		log.info("m=makeRequestWithBody; stage=init; transactionUUID= {}; Object= {}", "", "");
+		ResponseEntity responseEntity = null;
+		log.info("m=makeRequestWithBody; stage=init; transactionUUID= {}; url= {}; httpMethod={}; Object= {}", "", url, httpMethod, body);
 
 		try {
-			HttpEntity<?> request = new HttpEntity<>(body);
-			exchange = restTemplate.exchange(url, httpMethod, request, classReturn);
+			HttpEntity<?> httpEntity = new HttpEntity<>(body);
+			responseEntity = restTemplate.exchange(url, httpMethod, httpEntity, classReturn);
 		} catch (Exception ex) {
 
 		}
 		log.info("m=makeRequestWithBody; stage=finished; transactionUUID= {}; Object= {}", "", "");
-		return exchange;
+		return responseEntity;
 	}
 }

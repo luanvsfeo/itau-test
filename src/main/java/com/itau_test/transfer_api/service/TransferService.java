@@ -1,13 +1,10 @@
 package com.itau_test.transfer_api.service;
 
-import com.itau_test.transfer_api.DTO.TransferRequestDTO;
+import com.itau_test.transfer_api.DTO.*;
 import lombok.extern.log4j.Log4j2;
-import org.json.JSONObject;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @Log4j2
@@ -28,14 +25,14 @@ public class TransferService {
 		boolean receivingClientExists = clientExists(transferDataObject.getReceivingClientId());
 
 		if (receivingClientExists) {
-			// bate na api de contgs
-			String sendingClientAccount = getAccountData(transferDataObject.getSendingAccount());
 
-			boolean madeTheTransfer = makeTheTransfer(new JSONObject(sendingClientAccount), transferDataObject);
+			AccountResponseDTO sendingClientAccount = getAccountData(transferDataObject.getSendingAccount());
 
-			if (madeTheTransfer) {
+			boolean response = couldMakeTheTransfer(sendingClientAccount, transferDataObject);
+
+			if (response) {
 				result = true;
-				makeNotification();
+				makeNotification(new NotificationRequestDTO(transferDataObject.getAmount(), transferDataObject.getSendingAccount(), transferDataObject.getReceivingAccount()));
 			}
 		}
 
@@ -44,46 +41,49 @@ public class TransferService {
 	}
 
 
-	private boolean makeTheTransfer(JSONObject accountData, TransferRequestDTO transferData) {
+	private boolean couldMakeTheTransfer(AccountResponseDTO accountData, TransferRequestDTO transferData) {
 
-		if (accountData.getBoolean("ativo") && hasLimitEnough(accountData, transferData) && hasMoneyEnough(accountData, transferData)) {
-			// faz a transferencia
-			// colocar a chamada para atualizar o saldo de ambas as contas
-			// criar um banco de dados ?
+		if (accountData.isAtivo() && hasLimitEnough(accountData, transferData) && hasMoneyEnough(accountData, transferData)) {
+
+			updateAccountsBalance(transferData);
 			return true;
 		} else {
-			// nao faz a transferencia
 			return false;
 		}
 	}
 
 
-	private boolean hasLimitEnough(JSONObject accountData, TransferRequestDTO transferData) {
-		return accountData.getDouble("limiteDiario") < transferData.getAmount();
+	private boolean hasLimitEnough(AccountResponseDTO accountData, TransferRequestDTO transferData) {
+		return accountData.getLimiteDiario() > transferData.getAmount();
 	}
 
-	private boolean hasMoneyEnough(JSONObject accountData, TransferRequestDTO transferData) {
-		return accountData.getDouble("saldo") < transferData.getAmount();
+
+	private boolean hasMoneyEnough(AccountResponseDTO accountData, TransferRequestDTO transferData) {
+		return accountData.getSaldo() > transferData.getAmount();
 	}
 
 
 	private boolean clientExists(String clientId) {
-		// buscar o cliente e verifica se ele existe
-		ResponseEntity<?> stringResponseEntity = requestService.makeRequestWithoutBody("localhost:8080/clientes/" + clientId, HttpMethod.GET, String.class);
-		// todo - trocar isso aqui para o DTO
 
-		return stringResponseEntity.getStatusCode().value() == 200;
+		ResponseEntity<?> stringResponseEntity = requestService.makeRequestWithoutBody("localhost:8080/clientes/" + clientId, HttpMethod.GET, ClientResponseDTO.class);
+		return stringResponseEntity.getStatusCode().is2xxSuccessful();
 	}
 
-	private String getAccountData(String accountId) {
-		// buscar a conta do client que esta fazendo a transferencia
-		return (String) requestService.makeRequestWithoutBody("localhost:8080/contas/" + accountId, HttpMethod.GET, String.class).getBody();
-		// todo - trocar isso aqui para o dto
+
+	private AccountResponseDTO getAccountData(String accountId) {
+
+		return (AccountResponseDTO) requestService.makeRequestWithoutBody("localhost:8080/contas/" + accountId, HttpMethod.GET, AccountResponseDTO.class).getBody();
 	}
 
-	private String makeNotification() {
-		// faz a notificacao
-		return (String) requestService.makeRequestWithoutBody("localhost:8080/notificacoes/", HttpMethod.POST, String.class).getBody();
-		// todo - trocar isso aqui para o dto
+
+	private void updateAccountsBalance(TransferRequestDTO transferRequestDTO) {
+		requestService.makeRequestWithBody("localhost:8080/contas/saldos", HttpMethod.PUT, String.class, new UpdateBalanceAmountRequestDTO(transferRequestDTO));
+	}
+
+
+	private boolean makeNotification(NotificationRequestDTO notificationRequestDTO) {
+		ResponseEntity<?> responseEntity = requestService.makeRequestWithBody("localhost:8080/notificacoes/", HttpMethod.POST, String.class, notificationRequestDTO);
+
+		return responseEntity.getStatusCode().is2xxSuccessful();
 	}
 }
