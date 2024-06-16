@@ -56,6 +56,31 @@ public class TransferServiceTest {
 	}
 
 
+
+	@Test
+	void transferInvalid() {
+
+		when(restTemplate.exchange(contains("/clientes"), any(), any(), eq(ClientResponseDTO.class))).thenReturn(ResponseEntity.ok().body(responseClientApi()));
+		when(restTemplate.exchange(contains("/contas"), eq(HttpMethod.GET), any(), eq(AccountResponseDTO.class))).thenReturn(ResponseEntity.ok().body(responseAccountApi()));
+		when(restTemplate.exchange(contains("/saldos"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
+		when(restTemplate.exchange(contains("/notificacoes"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
+
+
+		boolean response = transferService.create(
+				new TransferRequestDTO(
+						UUID.randomUUID(),
+						"2ceb26e9-7b5c-417e-bf75-ffaa66e3a76f",
+						6000.00,
+						"41313d7b-bd75-4c75-9dea-1f4be434007f",
+						"d0d32142-74b7-4aca-9c68-838aeacef96b"
+				)
+		);
+
+		Assertions.assertFalse(response);
+
+	}
+
+
 	private AccountResponseDTO responseAccountApi() {
 		return new AccountResponseDTO(
 				"d32142-74b7-4aca-9c68-838aeacef96b",
