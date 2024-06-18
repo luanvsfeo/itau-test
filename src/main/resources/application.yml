@@ -7,3 +7,11 @@ url:
   post-notification: localhost:8080/notificacoes/
   get-account: localhost:8080/contas/{uuid}
   put-account: localhost:8080/contas/saldos
+
+springdoc:
+  packagesToScan: com.itau_test
+
+server:
+  servlet:
+    context-path: /transfer-api
+  port: 8081

@@ -32,7 +32,7 @@ public class RequestService {
 		} catch (Exception ex) {
 
 		}
-		log.info("m=makeRequestWithBody; stage=finished; transactionUUID= {}; Object= {}", "", "");
+		log.info("m=makeRequestWithBody; stage=finished; transactionUUID= {}; Object= {}", "", responseEntity != null ? responseEntity.getBody() : null);
 		return responseEntity;
 	}
 }
