@@ -48,7 +48,11 @@ public class TransferServiceTest {
 						50,
 						"41313d7b-bd75-4c75-9dea-1f4be434007f",
 						"d0d32142-74b7-4aca-9c68-838aeacef96b"
-				)
+				),
+				"/clientes/{uuid}",
+				"/notificacoes",
+				"/contas/{uuid}",
+				"/saldos"
 		);
 
 		Assertions.assertTrue(response);
@@ -73,7 +77,11 @@ public class TransferServiceTest {
 						6000.00,
 						"41313d7b-bd75-4c75-9dea-1f4be434007f",
 						"d0d32142-74b7-4aca-9c68-838aeacef96b"
-				)
+				),
+				"/clientes/{uuid}",
+				"/notificacoes",
+				"/contas/{uuid}",
+				"/saldos"
 		);
 
 		Assertions.assertFalse(response);

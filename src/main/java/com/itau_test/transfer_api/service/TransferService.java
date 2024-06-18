@@ -16,23 +16,37 @@ public class TransferService {
 		this.requestService = requestService;
 	}
 
-	public boolean create(TransferRequestDTO transferDataObject) {
+	public boolean create(
+			TransferRequestDTO transferDataObject,
+			String urlGetClient,
+			String urlPostNotification,
+			String urlGetAccount,
+			String urlPutAccount
+	) {
 
 		boolean result = false;
 
 		log.info("m=create; stage=init; transactionUUID= {}; transferJson= {}", transferDataObject.getTransferId(), transferDataObject);
 
-		boolean receivingClientExists = clientExists(transferDataObject.getReceivingClientId());
+		boolean receivingClientExists = clientExists(urlGetClient, transferDataObject.getReceivingClientId());
 
 		if (receivingClientExists) {
 
-			AccountResponseDTO sendingClientAccount = getAccountData(transferDataObject.getSendingAccount());
+			AccountResponseDTO sendingClientAccount = getAccountData(urlGetAccount, transferDataObject.getSendingAccount());
 
-			boolean response = couldMakeTheTransfer(sendingClientAccount, transferDataObject);
+			boolean response = couldMakeTheTransfer(urlPutAccount, sendingClientAccount, transferDataObject);
 
 			if (response) {
 				result = true;
-				makeNotification(new NotificationRequestDTO(transferDataObject.getAmount(), transferDataObject.getSendingAccount(), transferDataObject.getReceivingAccount()));
+
+				makeNotification(
+						urlPostNotification,
+						new NotificationRequestDTO(
+								transferDataObject.getAmount(),
+								transferDataObject.getSendingAccount(),
+								transferDataObject.getReceivingAccount()
+						)
+				);
 			}
 		}
 
@@ -41,11 +55,11 @@ public class TransferService {
 	}
 
 
-	private boolean couldMakeTheTransfer(AccountResponseDTO accountData, TransferRequestDTO transferData) {
+	private boolean couldMakeTheTransfer(String urlPutAccount, AccountResponseDTO accountData, TransferRequestDTO transferData) {
 
 		if (accountData.isAtivo() && hasLimitEnough(accountData, transferData) && hasMoneyEnough(accountData, transferData)) {
 
-			updateAccountsBalance(transferData);
+			updateAccountsBalance(urlPutAccount, transferData);
 			return true;
 		} else {
 			return false;
@@ -63,26 +77,26 @@ public class TransferService {
 	}
 
 
-	private boolean clientExists(String clientId) {
+	private boolean clientExists(String urlGetClient, String clientId) {
 
-		ResponseEntity<?> stringResponseEntity = requestService.makeRequestWithoutBody("localhost:8080/clientes/" + clientId, HttpMethod.GET, ClientResponseDTO.class);
+		ResponseEntity<?> stringResponseEntity = requestService.makeRequestWithoutBody(urlGetClient.replace("{uuid}", clientId), HttpMethod.GET, ClientResponseDTO.class);
 		return stringResponseEntity.getStatusCode().is2xxSuccessful();
 	}
 
 
-	private AccountResponseDTO getAccountData(String accountId) {
+	private AccountResponseDTO getAccountData(String urlGetAccount, String accountId) {
 
-		return (AccountResponseDTO) requestService.makeRequestWithoutBody("localhost:8080/contas/" + accountId, HttpMethod.GET, AccountResponseDTO.class).getBody();
+		return (AccountResponseDTO) requestService.makeRequestWithoutBody(urlGetAccount.replace("{uuid}", accountId), HttpMethod.GET, AccountResponseDTO.class).getBody();
 	}
 
 
-	private void updateAccountsBalance(TransferRequestDTO transferRequestDTO) {
-		requestService.makeRequestWithBody("localhost:8080/contas/saldos", HttpMethod.PUT, String.class, new UpdateBalanceAmountRequestDTO(transferRequestDTO));
+	private void updateAccountsBalance(String urlPutAccount, TransferRequestDTO transferRequestDTO) {
+		requestService.makeRequestWithBody(urlPutAccount, HttpMethod.PUT, String.class, new UpdateBalanceAmountRequestDTO(transferRequestDTO));
 	}
 
 
-	private boolean makeNotification(NotificationRequestDTO notificationRequestDTO) {
-		ResponseEntity<?> responseEntity = requestService.makeRequestWithBody("localhost:8080/notificacoes/", HttpMethod.POST, String.class, notificationRequestDTO);
+	private boolean makeNotification(String urlPostNotification, NotificationRequestDTO notificationRequestDTO) {
+		ResponseEntity<?> responseEntity = requestService.makeRequestWithBody(urlPostNotification, HttpMethod.POST, String.class, notificationRequestDTO);
 
 		return responseEntity.getStatusCode().is2xxSuccessful();
 	}

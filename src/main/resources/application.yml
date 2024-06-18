@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: transfer-api
+
+url:
+  get-client: localhost:8080/clientes/{uuid}
+  post-notification: localhost:8080/notificacoes/
+  get-account: localhost:8080/contas/{uuid}
+  put-account: localhost:8080/contas/saldos
