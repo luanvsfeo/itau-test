@@ -1,5 +1,3 @@
-# Projeto de API para realização de Transferência bancaria
-
 ## Desafio
 
 " Desenhar e desenvolver uma solução que permita que os clientes consigam realizar
