@@ -5,9 +5,6 @@ Transferência entre contas. Essa solução precisa ser resiliente, ter alta dis
 evolução/manutenção "
 
 
-## Diagrama de classe
-
-
 ## Arquitetura de solução
 ![aws-itau-test-sem(1)](https://github.com/luanvsfeo/itau-test/assets/54812655/745b6971-23fb-468f-b244-86a1ceb08abb)
 
