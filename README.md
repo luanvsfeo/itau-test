@@ -20,7 +20,7 @@ evolução/manutenção "
 Por ser um projeto relativamente pequeno e por eu ter maior experiencia em um modelo especifico, optei por estruturar o mesmo em camadas, fazendo com que em cada pacote fique uma parte do codigo. 
 - **controller** : parte de entrada (endpoints da api)
 - **service** : parte que fica responsavel pela as regras de negocios
-- **repository** : parte que faz comunicacao com o banco de dados (DAO's e repositories)
+- **repository** : parte que faz comunicação  com o banco de dados (DAO's e repositories)
 
 
 ## Payloads
@@ -38,7 +38,7 @@ Para realizar uma transferencia
   }
 ```
 
-| campo | descricao |
+| campo | descrição  |
 |----|-----------|
 |receivingClientId | UUID do usuario que vai receber a transferencia|
 |amount | Valor a ser transferido |
