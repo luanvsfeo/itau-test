@@ -11,3 +11,9 @@ public class TransferApiApplication {
 	}
 
 }
+
+/*
+ + melhorar a parte de request
+ + colocar uma handler (tratamento de erro e mensagem para cada caso)
+
+ */
