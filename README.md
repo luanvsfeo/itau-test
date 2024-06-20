@@ -1,4 +1,4 @@
-## Desafio
+# Projeto de API para Transferencia bancaria 
 
 " Desenhar e desenvolver uma solução que permita que os clientes consigam realizar
 Transferência entre contas. Essa solução precisa ser resiliente, ter alta disponibilidade e de fácil
@@ -20,7 +20,9 @@ Por ser um projeto relativamente pequeno e por eu ter maior experiencia em um mo
 
 ## Payloads
 
-Para realizar uma transferencia 
+### Endpoints
+
+> Para realizar uma transferencia 
 
 **POST** | /transfer-api/transfer
 
@@ -41,7 +43,7 @@ Para realizar uma transferencia
 |sendingAccount | UUID da conta do usuario que vai realizar a transferencia |
 |receivingAccount | UUID da conta do usuario que vai receber a transferencia |
 
-OBS: Todos os campos sao **obrigatorios** 
+> OBS: Todos os campos sao **obrigatorios** 
 
 ### Swagger
 /transfer-api/swagger-ui/index.html
@@ -63,6 +65,9 @@ OBS: Todos os campos sao **obrigatorios**
   - Criação de um outro AWS Lambda para fazer a parte de autenticação (consultando no secrets manager)
 
 
+## Proposta de melhoria de arquitetura (serverless)
+
+![aws-itau-test-serverless](https://github.com/luanvsfeo/itau-test/assets/54812655/251c7014-6ac3-48e6-8301-3c5d9b3d1290)
 
 
 
