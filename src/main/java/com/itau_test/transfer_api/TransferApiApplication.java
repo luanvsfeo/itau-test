@@ -13,11 +13,7 @@ public class TransferApiApplication {
 }
 
 /*
- + fazer os testes
  + melhorar a parte de request
- + colocar uma handler
- + comecar o desenho de solucao
-
-
+ + colocar uma handler (tratamento de erro e mensagem para cada caso)
 
  */

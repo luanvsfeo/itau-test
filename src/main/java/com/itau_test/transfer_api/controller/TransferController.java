@@ -2,6 +2,7 @@ package com.itau_test.transfer_api.controller;
 
 import com.itau_test.transfer_api.DTO.TransferRequestDTO;
 import com.itau_test.transfer_api.service.TransferService;
+import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,9 +32,7 @@ public class TransferController {
 
 
 	@PostMapping
-	ResponseEntity<?> createTransfer(@RequestBody TransferRequestDTO transferJson) {
-
-		transferJson.populateId();
+	ResponseEntity<?> createTransfer( @Valid @RequestBody TransferRequestDTO transferJson) {
 
 		log.info("m=createTransfer; stage=init; transactionUUID= {}; transferJson= {}", transferJson.getTransferId(), transferJson);
 

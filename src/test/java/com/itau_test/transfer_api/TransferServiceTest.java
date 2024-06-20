@@ -11,9 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import org.webjars.NotFoundException;
 
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -59,10 +61,89 @@ public class TransferServiceTest {
 
 	}
 
+	@Test
+	void transferInvalidClientNotFound() {
+
+		when(restTemplate.exchange(contains("/clientes"), any(), any(), eq(ClientResponseDTO.class))).thenReturn(ResponseEntity.notFound().build());
+		when(restTemplate.exchange(contains("/contas"), eq(HttpMethod.GET), any(), eq(AccountResponseDTO.class))).thenReturn(ResponseEntity.ok().body(responseAccountApiDeactivated()));
+		when(restTemplate.exchange(contains("/saldos"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
+		when(restTemplate.exchange(contains("/notificacoes"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
+
+
+		assertThrows(NotFoundException.class, () ->
+				transferService.create(
+						new TransferRequestDTO(
+								UUID.randomUUID(),
+								"2ceb26e9-7b5c-417e-bf75-ffaa66e3a76f",
+								6000.00,
+								"41313d7b-bd75-4c75-9dea-1f4be434007f",
+								"d0d32142-74b7-4aca-9c68-838aeacef96b"
+						),
+						"/clientes/{uuid}",
+						"/notificacoes",
+						"/contas/{uuid}",
+						"/saldos"
+				)
+		);
+	}
 
 
 	@Test
-	void transferInvalid() {
+	void transferInvalidAccountNotFound() {
+
+		when(restTemplate.exchange(contains("/clientes"), any(), any(), eq(ClientResponseDTO.class))).thenReturn(ResponseEntity.ok().body(responseClientApi()));
+		when(restTemplate.exchange(contains("/contas"), eq(HttpMethod.GET), any(), eq(AccountResponseDTO.class))).thenReturn(ResponseEntity.notFound().build());
+		when(restTemplate.exchange(contains("/saldos"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
+		when(restTemplate.exchange(contains("/notificacoes"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
+
+
+		assertThrows(NotFoundException.class, () ->
+				transferService.create(
+						new TransferRequestDTO(
+								UUID.randomUUID(),
+								"2ceb26e9-7b5c-417e-bf75-ffaa66e3a76f",
+								6000.00,
+								"41313d7b-bd75-4c75-9dea-1f4be434007f",
+								"d0d32142-74b7-4aca-9c68-838aeacef96b"
+						),
+						"/clientes/{uuid}",
+						"/notificacoes",
+						"/contas/{uuid}",
+						"/saldos"
+				)
+		);
+	}
+
+
+	@Test
+	void transferInvalidAccountDeactivated() {
+
+		when(restTemplate.exchange(contains("/clientes"), any(), any(), eq(ClientResponseDTO.class))).thenReturn(ResponseEntity.ok().body(responseClientApi()));
+		when(restTemplate.exchange(contains("/contas"), eq(HttpMethod.GET), any(), eq(AccountResponseDTO.class))).thenReturn(ResponseEntity.ok().body(responseAccountApiDeactivated()));
+		when(restTemplate.exchange(contains("/saldos"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
+		when(restTemplate.exchange(contains("/notificacoes"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
+
+
+		assertThrows(IllegalStateException.class, () ->
+				transferService.create(
+						new TransferRequestDTO(
+								UUID.randomUUID(),
+								"2ceb26e9-7b5c-417e-bf75-ffaa66e3a76f",
+								6000.00,
+								"41313d7b-bd75-4c75-9dea-1f4be434007f",
+								"d0d32142-74b7-4aca-9c68-838aeacef96b"
+						),
+						"/clientes/{uuid}",
+						"/notificacoes",
+						"/contas/{uuid}",
+						"/saldos"
+				)
+		);
+	}
+
+
+	@Test
+	void transferInvalidNotEnoughLimit() {
 
 		when(restTemplate.exchange(contains("/clientes"), any(), any(), eq(ClientResponseDTO.class))).thenReturn(ResponseEntity.ok().body(responseClientApi()));
 		when(restTemplate.exchange(contains("/contas"), eq(HttpMethod.GET), any(), eq(AccountResponseDTO.class))).thenReturn(ResponseEntity.ok().body(responseAccountApi()));
@@ -70,11 +151,11 @@ public class TransferServiceTest {
 		when(restTemplate.exchange(contains("/notificacoes"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
 
 
-		boolean response = transferService.create(
+		assertThrows(IllegalStateException.class, () -> transferService.create(
 				new TransferRequestDTO(
 						UUID.randomUUID(),
 						"2ceb26e9-7b5c-417e-bf75-ffaa66e3a76f",
-						6000.00,
+						600,
 						"41313d7b-bd75-4c75-9dea-1f4be434007f",
 						"d0d32142-74b7-4aca-9c68-838aeacef96b"
 				),
@@ -82,11 +163,9 @@ public class TransferServiceTest {
 				"/notificacoes",
 				"/contas/{uuid}",
 				"/saldos"
-		);
-
-		Assertions.assertFalse(response);
-
+		));
 	}
+
 
 
 	private AccountResponseDTO responseAccountApi() {
@@ -95,6 +174,15 @@ public class TransferServiceTest {
 				5000.00,
 				500.00,
 				true
+		);
+	}
+
+	private AccountResponseDTO responseAccountApiDeactivated() {
+		return new AccountResponseDTO(
+				"d32142-74b7-4aca-9c68-838aeacef96b",
+				5000.00,
+				500.00,
+				false
 		);
 	}
 

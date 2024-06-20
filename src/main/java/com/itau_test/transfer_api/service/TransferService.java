@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 @Service
 @Log4j2
@@ -57,7 +58,7 @@ public class TransferService {
 
 	private boolean couldMakeTheTransfer(String urlPutAccount, AccountResponseDTO accountData, TransferRequestDTO transferData) {
 
-		if (accountData.isAtivo() && hasLimitEnough(accountData, transferData) && hasMoneyEnough(accountData, transferData)) {
+		if (isActive(accountData) && hasLimitEnough(accountData, transferData) && hasMoneyEnough(accountData, transferData)) {
 
 			updateAccountsBalance(urlPutAccount, transferData);
 			return true;
@@ -66,32 +67,74 @@ public class TransferService {
 		}
 	}
 
+	private boolean isActive(AccountResponseDTO accountData) {
+		boolean result = accountData.isAtivo();
+
+		if (result) {
+			return true;
+		} else {
+			throw new IllegalStateException("Account is not available");
+		}
+	}
 
 	private boolean hasLimitEnough(AccountResponseDTO accountData, TransferRequestDTO transferData) {
-		return accountData.getLimiteDiario() > transferData.getAmount();
+
+		boolean result = accountData.getLimiteDiario() > transferData.getAmount();
+
+		if (result) {
+			return true;
+		} else {
+			throw new IllegalStateException("Not enough Limit today, try again tomorrow");
+		}
 	}
 
 
 	private boolean hasMoneyEnough(AccountResponseDTO accountData, TransferRequestDTO transferData) {
-		return accountData.getSaldo() > transferData.getAmount();
+
+		boolean result = accountData.getSaldo() > transferData.getAmount();
+
+		if (result) {
+			return true;
+		} else {
+			throw new IllegalStateException("Not enough money");
+		}
 	}
 
 
 	private boolean clientExists(String urlGetClient, String clientId) {
 
 		ResponseEntity<?> stringResponseEntity = requestService.makeRequestWithoutBody(urlGetClient.replace("{uuid}", clientId), HttpMethod.GET, ClientResponseDTO.class);
-		return stringResponseEntity.getStatusCode().is2xxSuccessful();
+
+		if (stringResponseEntity.getStatusCode().is2xxSuccessful()) {
+			return true;
+		} else {
+			throw new NotFoundException("Client not found ");
+		}
 	}
 
 
 	private AccountResponseDTO getAccountData(String urlGetAccount, String accountId) {
 
-		return (AccountResponseDTO) requestService.makeRequestWithoutBody(urlGetAccount.replace("{uuid}", accountId), HttpMethod.GET, AccountResponseDTO.class).getBody();
+		ResponseEntity<?> responseEntity = requestService.makeRequestWithoutBody(urlGetAccount.replace("{uuid}", accountId), HttpMethod.GET, AccountResponseDTO.class);
+
+		if (responseEntity.getStatusCode().is2xxSuccessful()) {
+			return (AccountResponseDTO) responseEntity.getBody();
+		} else {
+			throw new NotFoundException("Account not found");
+		}
 	}
 
 
-	private void updateAccountsBalance(String urlPutAccount, TransferRequestDTO transferRequestDTO) {
-		requestService.makeRequestWithBody(urlPutAccount, HttpMethod.PUT, String.class, new UpdateBalanceAmountRequestDTO(transferRequestDTO));
+	private boolean updateAccountsBalance(String urlPutAccount, TransferRequestDTO transferRequestDTO) {
+
+		ResponseEntity<?> responseEntity = requestService.makeRequestWithBody(urlPutAccount, HttpMethod.PUT, String.class, new UpdateBalanceAmountRequestDTO(transferRequestDTO));
+
+		if(responseEntity.getStatusCode().is2xxSuccessful()){
+			return true;
+		}else{
+			throw new IllegalStateException("Could not make the transfer");
+		}
+
 	}
 
 
