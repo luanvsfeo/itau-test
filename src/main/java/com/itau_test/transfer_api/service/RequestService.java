@@ -26,13 +26,11 @@ public class RequestService {
 		ResponseEntity responseEntity = null;
 		log.info("m=makeRequestWithBody; stage=init; transactionUUID= {}; url= {}; httpMethod={}; Object= {}", "", url, httpMethod, body);
 
-		try {
-			HttpEntity<?> httpEntity = new HttpEntity<>(body);
-			responseEntity = restTemplate.exchange(url, httpMethod, httpEntity, classReturn);
-		} catch (Exception ex) {
+		HttpEntity<?> httpEntity = new HttpEntity<>(body);
 
-		}
-		log.info("m=makeRequestWithBody; stage=finished; transactionUUID= {}; Object= {}", "", responseEntity );
+		responseEntity = restTemplate.exchange(url, httpMethod, httpEntity, classReturn);
+
+		log.info("m=makeRequestWithBody; stage=finished; transactionUUID= {}; Object= {}", "", responseEntity);
 		return responseEntity;
 	}
 }

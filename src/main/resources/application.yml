@@ -3,10 +3,10 @@ spring:
     name: transfer-api
 
 url:
-  get-client: localhost:8080/clientes/{uuid}
-  post-notification: localhost:8080/notificacoes/
-  get-account: localhost:8080/contas/{uuid}
-  put-account: localhost:8080/contas/saldos
+  get-client: http://localhost:9090/clientes/{uuid}
+  post-notification: http://localhost:9090/notificacoes
+  get-account: http://localhost:9090/contas/{uuid}
+  put-account: http://localhost:9090/contas/saldos
 
 springdoc:
   packagesToScan: com.itau_test

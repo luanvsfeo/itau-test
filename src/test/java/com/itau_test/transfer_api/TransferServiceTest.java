@@ -70,7 +70,7 @@ public class TransferServiceTest {
 		when(restTemplate.exchange(contains("/notificacoes"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
 
 
-		assertThrows(NotFoundException.class, () ->
+		assertThrows(IllegalStateException.class, () ->
 				transferService.create(
 						new TransferRequestDTO(
 								UUID.randomUUID(),
@@ -97,7 +97,7 @@ public class TransferServiceTest {
 		when(restTemplate.exchange(contains("/notificacoes"), any(), any(), eq(String.class))).thenReturn(ResponseEntity.ok().body(null));
 
 
-		assertThrows(NotFoundException.class, () ->
+		assertThrows(IllegalStateException.class, () ->
 				transferService.create(
 						new TransferRequestDTO(
 								UUID.randomUUID(),

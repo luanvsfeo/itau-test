@@ -103,44 +103,81 @@ public class TransferService {
 
 	private boolean clientExists(String urlGetClient, String clientId) {
 
-		ResponseEntity<?> stringResponseEntity = requestService.makeRequestWithoutBody(urlGetClient.replace("{uuid}", clientId), HttpMethod.GET, ClientResponseDTO.class);
+		try {
+			ResponseEntity<?> stringResponseEntity = requestService.makeRequestWithoutBody(urlGetClient.replace("{uuid}", clientId), HttpMethod.GET, ClientResponseDTO.class);
 
-		if (stringResponseEntity.getStatusCode().is2xxSuccessful()) {
-			return true;
-		} else {
-			throw new NotFoundException("Client not found ");
+			if (stringResponseEntity != null) {
+				if (stringResponseEntity.getStatusCode().is2xxSuccessful()) {
+					return true;
+				}else {
+					throw new NotFoundException("Client not found");
+				}
+			}
+		} catch (Exception ex) {
+			throw new IllegalStateException("Something went wrong | CLIENT API | ".concat(ex.getMessage()), ex.getCause());
 		}
+
+		return false;
 	}
 
 
 	private AccountResponseDTO getAccountData(String urlGetAccount, String accountId) {
 
-		ResponseEntity<?> responseEntity = requestService.makeRequestWithoutBody(urlGetAccount.replace("{uuid}", accountId), HttpMethod.GET, AccountResponseDTO.class);
+		try {
+			ResponseEntity<?> responseEntity = requestService.makeRequestWithoutBody(urlGetAccount.replace("{uuid}", accountId), HttpMethod.GET, AccountResponseDTO.class);
 
-		if (responseEntity.getStatusCode().is2xxSuccessful()) {
-			return (AccountResponseDTO) responseEntity.getBody();
-		} else {
-			throw new NotFoundException("Account not found");
+			if (responseEntity != null) {
+				if (responseEntity.getStatusCode().is2xxSuccessful()) {
+					return (AccountResponseDTO) responseEntity.getBody();
+				}else {
+					throw new NotFoundException("Account not found");
+				}
+			}
+		} catch (Exception ex) {
+			throw new IllegalStateException("Something went wrong | GET ACCOUNTS API | ".concat(ex.getMessage()), ex.getCause());
 		}
+
+		return null;
 	}
 
 
 	private boolean updateAccountsBalance(String urlPutAccount, TransferRequestDTO transferRequestDTO) {
 
-		ResponseEntity<?> responseEntity = requestService.makeRequestWithBody(urlPutAccount, HttpMethod.PUT, String.class, new UpdateBalanceAmountRequestDTO(transferRequestDTO));
 
-		if(responseEntity.getStatusCode().is2xxSuccessful()){
-			return true;
-		}else{
-			throw new IllegalStateException("Could not make the transfer");
+		try {
+			ResponseEntity<?> responseEntity = requestService.makeRequestWithBody(urlPutAccount, HttpMethod.PUT, String.class, new UpdateBalanceAmountRequestDTO(transferRequestDTO));
+
+			if (responseEntity != null) {
+				if (responseEntity.getStatusCode().is2xxSuccessful()) {
+					return true;
+				}else {
+					throw new NotFoundException("Cloud not update accounts");
+				}
+			}
+		} catch (Exception ex) {
+			throw new IllegalStateException("Something went wrong | PUT ACCOUNTS API | ".concat(ex.getMessage()), ex.getCause());
 		}
 
+		return false;
 	}
 
 
 	private boolean makeNotification(String urlPostNotification, NotificationRequestDTO notificationRequestDTO) {
-		ResponseEntity<?> responseEntity = requestService.makeRequestWithBody(urlPostNotification, HttpMethod.POST, String.class, notificationRequestDTO);
 
-		return responseEntity.getStatusCode().is2xxSuccessful();
+		try {
+			ResponseEntity<?> responseEntity = requestService.makeRequestWithBody(urlPostNotification, HttpMethod.POST, String.class, notificationRequestDTO);
+
+			if (responseEntity != null) {
+				if (responseEntity.getStatusCode().is2xxSuccessful()) {
+					return true;
+				}else {
+					throw new NotFoundException("Cloud send notification");
+				}
+			}
+		} catch (Exception ex) {
+			throw new IllegalStateException("Something went wrong | NOTIFICATIONS API | ".concat(ex.getMessage()), ex.getCause());
+		}
+
+		return false;
 	}
 }

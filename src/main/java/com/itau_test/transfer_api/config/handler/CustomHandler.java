@@ -1,6 +1,6 @@
 package com.itau_test.transfer_api.config.handler;
 
-import org.json.JSONObject;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -10,12 +10,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
+@Log4j2
 @ControllerAdvice
 public class CustomHandler extends ResponseEntityExceptionHandler {
 
@@ -23,20 +24,35 @@ public class CustomHandler extends ResponseEntityExceptionHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
 
-		List<JSONObject> errorResponse = new ArrayList<>();
+		log.info("m=handleMethodArgumentNotValid | message={} ", ex.getMessage());
+
+		HashMap<String, String> errors = new HashMap<>();
 		for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
 
-			errorResponse.add(
-					new JSONObject()
-					.put("message", fieldError.getDefaultMessage())
-					.put("field", fieldError.getField())
-			);
+			errors.put(fieldError.getField(), fieldError.getDefaultMessage());
 		}
-		return ResponseEntity.badRequest().body(errorResponse);
+
+		log.info("m=handleMethodArgumentNotValid | errors={} ", errors);
+
+		return ResponseEntity.badRequest().body(new Message(errors));
 	}
 
-	@ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class})
+	@ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class, HttpClientErrorException.class})
 	protected ResponseEntity<Object> handleIllegalArgumentException(RuntimeException ex, WebRequest request) {
-		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+
+		log.info("m=handleIllegalArgumentException | message={} ", ex.getMessage());
+
+		HashMap<String, String> errors = new HashMap<>();
+		errors.put("message", resizeMessage(ex.getMessage()));
+
+		return ResponseEntity.badRequest().body(new Message(errors));
+	}
+
+	private String resizeMessage(String message) {
+		if (message.length() >= 50) {
+			return message.substring(0, 50);
+		} else {
+			return message;
+		}
 	}
 }

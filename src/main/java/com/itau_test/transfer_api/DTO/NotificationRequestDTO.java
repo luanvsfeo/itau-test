@@ -13,14 +13,14 @@ public class NotificationRequestDTO {
 	private double valor;
 	private Conta conta;
 
+	@Getter
+	@Setter
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
 	public static class Conta {
 		private String idOrigem;
 		private String idDestino;
-
-		public Conta(String idOrigem, String idDestino) {
-			this.idOrigem = idOrigem;
-			this.idDestino = idDestino;
-		}
 	}
 
 	public NotificationRequestDTO(double valor, String contaOrigem, String contaDestino) {
