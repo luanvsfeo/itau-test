@@ -29,9 +29,9 @@ Por ser um projeto relativamente pequeno e por eu ter maior experiencia em um mo
 ```
   {
     "receivingClientId" : "2ceb26e9-7b5c-417e-bf75-ffaa66e3a76f",
-    "amount" : 2.399,
-    "sendingAccount" : "41313d7b-bd75-4c75-9dea-1f4be434007f",
-    "receivingAccount" : "d0d32142-74b7-4aca-9c68-838aeacef96b"
+    "amount" : 40,
+    "sendingAccount" : "d0d32142-74b7-4aca-9c68-838aeacef96b",
+    "receivingAccount" :  "41313d7b-bd75-4c75-9dea-1f4be434007f"
   }
 ```
 ### Dicionario de dados
