@@ -62,9 +62,9 @@ public class TransferService {
 
 			updateAccountsBalance(urlPutAccount, transferData);
 			return true;
-		} else {
-			return false;
 		}
+
+		return false;
 	}
 
 	private boolean isActive(AccountResponseDTO accountData) {
@@ -109,7 +109,7 @@ public class TransferService {
 			if (stringResponseEntity != null) {
 				if (stringResponseEntity.getStatusCode().is2xxSuccessful()) {
 					return true;
-				}else {
+				} else {
 					throw new NotFoundException("Client not found");
 				}
 			}
@@ -129,7 +129,7 @@ public class TransferService {
 			if (responseEntity != null) {
 				if (responseEntity.getStatusCode().is2xxSuccessful()) {
 					return (AccountResponseDTO) responseEntity.getBody();
-				}else {
+				} else {
 					throw new NotFoundException("Account not found");
 				}
 			}
@@ -150,7 +150,7 @@ public class TransferService {
 			if (responseEntity != null) {
 				if (responseEntity.getStatusCode().is2xxSuccessful()) {
 					return true;
-				}else {
+				} else {
 					throw new NotFoundException("Cloud not update accounts");
 				}
 			}
@@ -170,7 +170,7 @@ public class TransferService {
 			if (responseEntity != null) {
 				if (responseEntity.getStatusCode().is2xxSuccessful()) {
 					return true;
-				}else {
+				} else {
 					throw new NotFoundException("Cloud send notification");
 				}
 			}

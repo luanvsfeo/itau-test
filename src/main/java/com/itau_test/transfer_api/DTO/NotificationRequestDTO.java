@@ -6,7 +6,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Data
 public class NotificationRequestDTO {
 
@@ -14,7 +13,6 @@ public class NotificationRequestDTO {
 	private Conta conta;
 
 	@Getter
-	@Setter
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor

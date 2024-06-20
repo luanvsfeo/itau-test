@@ -8,7 +8,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 @Data
 public class TransferRequestDTO {
 
