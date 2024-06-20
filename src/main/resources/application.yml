@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: transfer-api
+
+url:
+  get-client: http://localhost:9090/clientes/{uuid}
+  post-notification: http://localhost:9090/notificacoes
+  get-account: http://localhost:9090/contas/{uuid}
+  put-account: http://localhost:9090/contas/saldos
+
+springdoc:
+  packagesToScan: com.itau_test
+
+server:
+  servlet:
+    context-path: /transfer-api
+  port: 8081
