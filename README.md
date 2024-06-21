@@ -18,6 +18,25 @@ Por ser um projeto relativamente pequeno e por eu ter maior experiencia em um mo
 - **repository** : parte que faz comunicação  com o banco de dados (DAO's e repositories)
 
 
+## Rodando o projeto
+
+Pelo Dockerfile
+
+```
+docker build . --tag=transfer-api:latest
+```
+```
+docker run -p 8081:9091 transfer-api:latest
+```
+Pelo Docker compose
+
+```
+docker-compose build
+```
+```
+docker-compose up
+```
+
 ## Payloads
 
 ### Endpoints
