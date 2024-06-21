@@ -12,6 +12,3 @@ public class TransferApiApplication {
 
 }
 
-/*
- + melhorar o log <deixar mais facil troubleshooting >
- */
