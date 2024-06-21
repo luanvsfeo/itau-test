@@ -20,7 +20,19 @@ Por ser um projeto relativamente pequeno e por eu ter maior experiencia em um mo
 
 ## Rodando o projeto
 
-Pelo Dockerfile
+### Passo 1 : Ambiente
+Clone o projeto para a sua maquina usando o Git
+```
+git clone https://github.com/luanvsfeo/itau-test.git
+```
+```
+cd itau-test
+```
+
+### Passo 2 : Construcao
+
+Na raiz do projeto, execute um dos comandos abaixo para rodar a aplicação na sua maquina 
+
 
 ```
 docker build . --tag=transfer-api:latest
@@ -28,7 +40,7 @@ docker build . --tag=transfer-api:latest
 ```
 docker run -p 8081:9091 transfer-api:latest
 ```
-Pelo Docker compose
+ou
 
 ```
 docker-compose build
