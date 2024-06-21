@@ -17,20 +17,20 @@ public class RequestService {
 		this.restTemplate = restTemplate;
 	}
 
-	public ResponseEntity<?> makeRequestWithoutBody(String url, HttpMethod httpMethod, Class classReturn) {
-		return makeRequestWithBody(url, httpMethod, classReturn, null);
+	public ResponseEntity<?> makeRequestWithoutBody(String url, HttpMethod httpMethod, Class classReturn, String transferUuid) {
+		return makeRequestWithBody(url, httpMethod, classReturn, null, transferUuid);
 	}
 
-	public ResponseEntity<?> makeRequestWithBody(String url, HttpMethod httpMethod, Class classReturn, Object body) {
+	public ResponseEntity<?> makeRequestWithBody(String url, HttpMethod httpMethod, Class classReturn, Object body, String transferUuid) {
 
 		ResponseEntity responseEntity = null;
-		log.info("m=makeRequestWithBody; stage=init; transactionUUID= {}; url= {}; httpMethod={}; Object= {}", "", url, httpMethod, body);
+		log.info("m=makeRequestWithBody; stage=init; transactionUUID= {}; url= {}; httpMethod={}; Object= {}", transferUuid, url, httpMethod, body);
 
 		HttpEntity<?> httpEntity = new HttpEntity<>(body);
 
 		responseEntity = restTemplate.exchange(url, httpMethod, httpEntity, classReturn);
 
-		log.info("m=makeRequestWithBody; stage=finished; transactionUUID= {}; Object= {}", "", responseEntity);
+		log.info("m=makeRequestWithBody; stage=finished; transactionUUID= {}; Object= {}", transferUuid, responseEntity);
 		return responseEntity;
 	}
 }
